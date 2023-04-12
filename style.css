@@ -1,0 +1,46 @@
+/*
+    Theme Name: Wendy Spa Woocommerce
+    The URI:
+    Description: Tema para la Tienda  virtual de Wendy Spa
+    Author: Jonathan David Toro
+    Template: storefront
+    Version: 1.0
+    License: GNU General Public Licence v2 or later
+    Tags: Woocommerce, spa, responsive, ecommerce
+*/
+
+.site-header {
+	background: olive
+}
+
+.fa-shopping-cart:before {
+    margin-right: 10px;
+}
+
+.reservados {
+    background-color: #e182a8;
+    padding: 2rem 0;
+    text-align: center;
+    font-size: 20px;
+    color: white;
+}
+
+span.ahorro {
+    color: #333;
+    font-size: 1.2em;
+    font-weight: 700;
+    padding: .3em 1em;
+    text-align: right;
+    display: inline-block;
+    border: 1px solid #4cae4c;
+    margin-top: .8em;
+}
+
+
+/** Subtitulo del producto **/
+
+.subtitulo {
+    font-size: 20px;
+    font-style: italic;
+    color: #969696;
+}
