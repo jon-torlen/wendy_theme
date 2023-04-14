@@ -142,7 +142,152 @@ function video_en_producto() {
     }else{
         echo "No hay disponible";
     }
-}
+};
     
 
-?> 
+// Boton para vaciar el carrito
+add_action('woocommerce_cart_actions', 'wendyspa_limpiar_carrito');
+function wendyspa_limpiar_carrito() {
+    echo '<a class="button" href="?vaciar-carrito=true">' . __('Vaciar Carrito', 'woocommerce') . '</a>';
+};
+
+// Vaciar el carrito
+add_action('init', 'wendyspa_vaciar_carrito');
+
+function wendyspa_vaciar_carrito() {
+    if(isset($_GET['vaciar-carrito'])) {
+        global $woocommerce;
+        $woocommerce->cart->empty_cart();
+    }
+};
+
+// Imprimir banner realizado en ACF  en la agina de carrito
+
+add_action('woocommerce_check_cart_items', 'wendyspa_imprimir_banner_carrito', 10);
+function wendyspa_imprimir_banner_carrito() {
+    global $post;
+    $imagen = get_field('Imagen', $post->ID);
+    if($imagen) {
+        echo "<div class='cupon-carrito'";
+        echo "<img src='" . $imagen . "'>";
+        echo "</div>";
+    }
+};
+
+// Eliminar un campo del chekout
+
+add_filter('woocommerce_checkout_fields', 'wendyspa_remover_telefono_checkout', 20, 1);
+
+function wendyspa_remover_telefono_checkout($campos) {
+    unset($campos['billing']['billing_phone']);
+    return $campos;
+};
+
+// Agreagar campos en el ChekOut
+
+add_filter('woocommerce_checkout_fields', 'wendyspa_rfc', 40);
+
+function wendyspa_rfc($campos) {
+    $campos['billing']['factura'] = array(
+        'css' => array('form-row-wide'),
+        'label' => 'Requiere factura?',
+        'type' => 'checkbox',
+        'id' => 'factura'
+    );
+
+    $campos['billing']['rfc'] = array(
+        'css' => array('form-row-wide'),
+        'label' => 'RFC'
+    );
+
+$campos['order']['escuchaste_nosotros'] = array(
+    'type' => 'select',
+    'css' => array('form-row-wide'),
+    'label' => 'Como te enteraste de nosotros?',
+    'options' => array(
+        'default' => 'Seleccione...',
+        'tv' =>'TV',
+        'radio' => 'Radio',
+        'periodico' => 'Periodico',
+        'internet' => 'Internet',
+        'facebook' => 'Facebook'
+    )
+    );
+    return $campos;
+}
+
+/** Ocultar / Mostrar RFC en el checkout */
+function wendyspa_mostrar_RFC() {
+    if( is_checkout() ) { ?> 
+    <script>
+        $(document).ready(function() {
+            $('input[type="checkbox"]#factura').on('change', function() {
+                $('#rfc_field').slideToggle();
+            });
+        })
+        </script>
+   <?php }
+
+}
+
+add_action('wp_footer', 'wendyspa_mostrar_RFC');
+
+//Insertar campos personalizados en checkout
+add_action('woocommerce_checkout_update_order_meta', 'wendyspa_insertar_campos_personalizados');
+
+function wendyspa_insertar_campos_personalizados($orden_id){
+    if(! empty($_POST['rfc'])){
+        update_post_meta( $orden_id, 'RFC', sanitize_text_field($_POST['rfc']));
+    }
+    if(! empty($_POST['factura'])){
+        update_post_meta( $orden_id, 'factura', sanitize_text_field($_POST['factura']));
+    }
+    if(! empty($_POST['escuchaste_nosotros'])){
+        update_post_meta( $orden_id, 'escuchaste_nosotros', sanitize_text_field($_POST['escuchaste_nosotros']));
+    }
+}
+
+/**Agregar columnas personalizadas a la orden */
+add_filter('manage_edit-shop_order_columns', 'wendyspa_columnas_ordenes');
+function wendyspa_columnas_ordenes($columnas) {
+    $columnas['factura'] = __('Factura', 'woocommerce');
+    $columnas['rfc'] = __('Rfc', 'woocommerce');
+    $columnas['escuchaste_nosotros'] = __('Escuchaste de nosotros', 'woocommerce');
+    return $columnas;
+}
+
+/**Mostrar contenido dentro de las columnas */
+// add_action('manage_shop_order_posts_custom_column', 'wendyspa_columnas_informacion', 2);
+// function wendyspa_columnas_informacion( $columnas ) {
+//     global $post, $woocommerce, $order;
+
+//     //obtiene los valores de la orden (se pasa el ID de la orden)
+//     if( empty($order) || $order->id != $post->ID){
+//         $order = new WC_Order($post->ID);
+// }
+    
+
+//     if($columnas === 'factura') {
+//         $factura = get_post_meta($post->ID, 'factura', true);
+//         if($factura){
+//             echo 'Si';
+//         }
+//     }
+//     if ($columnas === 'rfc'){
+//         echo get_post_meta($post->ID, 'RFC', true);
+//     }
+//     if ($columnas === 'escuchaste_nosotros'){
+//         echo get_post_meta($post->ID, 'escuchaste_nosotros', true);
+// }
+// }
+
+// Mostrando los campos personalizados en pedidos
+add_action('woocommerce_admin_order_data_after_billing_address', 'wendyspa_mostrar_informacion_ordenes');
+function wendyspa_mostrar_informacion_ordenes($pedido){
+$factura = get_post_meta($pedido->ID, 'factura', true);
+if($factura){
+    echo '<p><strong>' . __('Factura', 'woocommerce') . ':</strong> Si </p>';
+    echo '<p><strong>' . __('RFC', 'woocommerce') . ':</strong>' . get_post_meta($pedido->id, 'RFC', true) . '</p>';
+}
+echo '<p><strong>' . __('Escuchaste de Nosotros en', 'woocommerce') . ': </strong>' . get_post_meta($pedido->id, 'escuchaste_nosotros', true) . '</p>';
+}

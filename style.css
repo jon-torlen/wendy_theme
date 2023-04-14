@@ -44,3 +44,13 @@ span.ahorro {
     font-style: italic;
     color: #969696;
 }
+
+/** Cupon de carrito **/
+.cupon-carrito {
+    margin-bottom: 20px;
+}
+
+/** Campos Checkout **/
+#rfc_field {
+    display: none;
+}
