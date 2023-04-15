@@ -291,3 +291,13 @@ if($factura){
 }
 echo '<p><strong>' . __('Escuchaste de Nosotros en', 'woocommerce') . ': </strong>' . get_post_meta($pedido->id, 'escuchaste_nosotros', true) . '</p>';
 }
+
+// Mostrar imagen cuando no haya imagen destacada
+
+function wendyspa_no_imagen_destacada($imagen_url) {
+    $imagen_url = get_stylesheet_directory_uri() . '/img/no-imagen.png';
+    return $imagen_url;
+}
+
+add_filter('woocommerce_placeholder_img_src', 'wendyspa_no_imagen_destacada');
+
