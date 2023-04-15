@@ -301,3 +301,34 @@ function wendyspa_no_imagen_destacada($imagen_url) {
 
 add_filter('woocommerce_placeholder_img_src', 'wendyspa_no_imagen_destacada');
 
+/**Imprimir entradas de blog en el Home */
+function wendyspa_entradas_blog(){
+    $args = array(
+        'post_type' => 'post',
+        'posts_per_page' => 3,
+        'orderby' => 'date',
+        'order' => 'DESC'
+    );
+    $entradas = new WP_Query($args); ?>
+    <div class="entradas-blog">
+        <h2 class="section-title">Ultimas entradas del blog</h2>
+        <ul>
+            <?php while($entradas->have_posts()): $entradas->the_post(); ?>
+            <li><?php the_title('<h3>', '</h3>'); ?></li>
+            <div class="contenido-entrada">
+                <header class="encabezado-entrada">
+                    <p>Por: <?php the_author(); ?> | <?php the_time(get_option('date_format')); ?>
+                </header>
+                <?php
+                $contenido = wp_trim_words(get_the_content(), 20, '');
+                echo $contenido;
+                ?>
+                <a href="<?php the_permalink(); ?>" class="buton enlace-entrada">Ver mas</a>
+            </div>
+            </li>
+            <?php endwhile; wp_reset_postdata(); ?>
+        </ul>
+</div>
+<?php
+}
+add_action('homepage', 'wendyspa_entradas_blog', 80);
