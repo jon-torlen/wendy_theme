@@ -1,5 +1,17 @@
 <?php 
 
+/**Dise;o de login personalizado */
+function wendyspa_admin_stilos(){
+    wp_enqueue_style('admin-estilos', get_stylesheet_directory_uri() . '/login/login.css');
+}
+add_action('login_enqueue_scripts', 'wendyspa_admin_stilos');
+
+/**Redireccionar link del logo del login */
+function wendyspa_redireccionar_admin(){
+    return home_url();
+}
+add_filter('login_headerurl', 'wendyspa_redireccionar_admin');
+
 
 // $tag = 'woocommerce_single_product_summary';
 // $function_to_remove = 'woocommerce_template_single_title';
@@ -38,12 +50,12 @@ function wendyspa_nuevo_footer(){
 
 // Agrega imagen al Home
 
-function wendyspa_descuento() {
-    $imagen = '<div class="destacada">';
-    $imagen .= '<img src="' . get_stylesheet_directory_uri() . '/img/cupon.jpg">';
-    $imagen .= '</div>';
-    echo $imagen;
-}
+// function wendyspa_descuento() {
+//     $imagen = '<div class="destacada">';
+//     $imagen .= '<img src="' . get_stylesheet_directory_uri() . '/img/cupon.jpg">';
+//     $imagen .= '</div>';
+//     echo $imagen;
+// }
 
 add_action('homepage', 'wendyspa_descuento', 5);
 
@@ -332,3 +344,9 @@ function wendyspa_entradas_blog(){
 <?php
 }
 add_action('homepage', 'wendyspa_entradas_blog', 80);
+
+//Imprime Shorcode con  Slider
+function wendyspa_slider() {
+    echo do_shortcode('[jtwcslider]');
+}
+add_action('homepage', 'wendyspa_slider', 5);
